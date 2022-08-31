@@ -28,11 +28,11 @@ function App() {
     } else {
       SetIsHaveZero(false)
     }
-  },[board])
+  },[board]);
   
   const filteredZero = (row) => {
     return row.filter(num => num !== 0)
-  }
+  };
   
   const slide = (row) => {
     row = filteredZero(row);
@@ -49,34 +49,66 @@ function App() {
       row.push(0)
     }
     return row;
-  }
+  };
 
   const slideLeft = () => {
     const newBoard = []
     for (let i = 0; i < 4; i++) {
-      newBoard[i] = slide(board[i])
-      console.log('newBord left', newBoard[i])
+      newBoard[i] = slide(board[i]);
     }
-    setBoard(newBoard)
-  }
+    setBoard(newBoard);
+  };
 
   const slideRight = () => {
     const newBoard = [];
     for (let i = 0; i < 4; i++) {
-      newBoard[i] = slide(board[i].reverse())
-      newBoard[i] = newBoard[i].reverse()
+      newBoard[i] = slide(board[i].reverse());
+      newBoard[i] = newBoard[i].reverse();
+    }
+    setBoard(newBoard);
+  };
+
+  const slideUp = () => {
+    const newBoard = [[], [], [], []];
+    for (let i = 0; i < 4; i++) {
+      let row = [board[0][i], board[1][i], board[2][i], board[3][i]];
+      row = slide(row);
+      newBoard[0][i] = row[0]
+      newBoard[1][i] = row[1]
+      newBoard[2][i] = row[2]
+      newBoard[3][i] = row[3]
     }
     setBoard(newBoard)
   }
 
-    const swipeDirection = (code) => {
+  const slideDown = () => {
+    const newBoard = [[], [], [], []];
+    for (let i = 0; i < 4; i++) {
+      let row = [board[0][i], board[1][i], board[2][i], board[3][i]];
+      console.log('slideUp', row)
+      row.reverse()
+      row = slide(row);
+      row.reverse()
+      console.log('slideUp after slide', row)
+      console.log('newBoard after slide', newBoard)
+      newBoard[0][i] = row[0]
+      newBoard[1][i] = row[1]
+      newBoard[2][i] = row[2]
+      newBoard[3][i] = row[3]
+    }
+    setBoard(newBoard)
+  }
+
+  const swipeDirection = (code) => {
     switch (code) {
       case 'ArrowUp': 
       console.log('Up')
+      slideUp()
         break;
 
       case 'ArrowDown': 
       console.log('Down')
+      slideDown()
         break;
 
       case 'ArrowLeft': 
@@ -92,7 +124,7 @@ function App() {
       default:
         break;
     }
-  }
+  };
 
   return (
     <div tabIndex={0} onKeyDown={(e) => swipeDirection(e.code)} className="App">
@@ -110,6 +142,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;
