@@ -2,33 +2,89 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 const initialBoard = [
-  [2, 128, 128, 2],
-  [0, 2, 0, 2],
-  [0, 2, 0, 4],
-  [2, 4096, 4096, 4],
-  // [2, 2, 2, 2],
-  // [2, 2, 2, 2],
-  // [2, 2, 2, 2],
-  // [2, 2, 2, 2],
-  // [0, 2, 4, 0],
-  // [0, 2, 4, 0],
-  // [0, 2, 4, 0],
-  // [0, 2, 4, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
 ]
+
+const addNumber = (newBoard) => {
+  let found = false
+  while (!found) {
+    let row = Math.floor(Math.random() * 4)
+    let col = Math.floor(Math.random() * 4)
+    let addDigit = 0;
+
+    if (Math.random() < 0.9) {
+      addDigit = 2;
+    } else {
+      addDigit = 4;
+    }
+    
+    if (newBoard[row][col] === 0) {
+      newBoard[row][col] = addDigit;
+      found = true;
+    }
+  }
+}
+
+addNumber(initialBoard)
+addNumber(initialBoard)
 
 function App() {
   const [board, setBoard] = useState(initialBoard)
   const [score, setScore] = useState(0)
-  const [isHaveZero, SetIsHaveZero] = useState('')
+  const [maxScore, setMaxScore] = useState(0)
+  const [isHaveZero, SetIsHaveZero] = useState(true)
+  const [isGameOver, SetIsGameOver] = useState(false)
   let point = score;
 
+  const newGame = () => {
+    setBoard(initialBoard)
+    SetIsGameOver(false)
+  }
+
   useEffect(() => {
-    if (board.join().includes(0)) {
+    if (score >= maxScore) {
+      setMaxScore(score)
+    }
+  },[score])
+
+  useEffect(() => {
+    if (board.flat().includes(0)) {
       SetIsHaveZero(true)
     } else {
       SetIsHaveZero(false)
     }
   },[board]);
+  
+  useEffect(() => {
+    if (!isHaveZero) {
+      let isRowMoveAvailable = false;
+      let isColumnMoveAvailable = false;
+
+      for (let i = 0; i < 4; i++) {
+        for(let k = 0; k < 3; k++) {
+          if (board[i][k] === board[i][k + 1]) {
+            isRowMoveAvailable = true
+          }
+        }
+      }
+  
+      for (let i = 0; i < 4; i++) {
+        for(let k = 0; k < 3; k++) {
+          if (board[k][i] === board[k + 1][i]) {
+            isColumnMoveAvailable = true;
+          }
+        }
+      }
+
+      if (!isColumnMoveAvailable && !isRowMoveAvailable) {
+        console.log('inn set game over')
+        SetIsGameOver(true)
+      }
+    }
+  }, [board, isHaveZero])
   
   const filteredZero = (row) => {
     return row.filter(num => num !== 0)
@@ -51,53 +107,76 @@ function App() {
     return row;
   };
 
+  const setNumber = (newBoard, board) => {
+    if (board.flat().join() !== newBoard.flat().join()) {
+      addNumber(newBoard)
+    }
+  }
+
   const slideLeft = () => {
     const newBoard = []
     for (let i = 0; i < 4; i++) {
       newBoard[i] = slide(board[i]);
     }
+
+    setNumber(newBoard, board)
     setBoard(newBoard);
   };
 
   const slideRight = () => {
-    const newBoard = [];
+    const newBoard = [[], [], [], []];
     for (let i = 0; i < 4; i++) {
-      newBoard[i] = slide(board[i].reverse());
-      newBoard[i] = newBoard[i].reverse();
+      let row = [];
+      for (let k = 0; k < 4; k++) {
+        row.push(board[i][k]);
+      }
+      row.reverse();
+      row = slide(row);
+      row.reverse();
+      for (let r = 0; r < 4; r++) {
+        newBoard[i][r] = row[r];
+      }
     }
+  
+    setNumber(newBoard, board)
     setBoard(newBoard);
   };
 
   const slideUp = () => {
     const newBoard = [[], [], [], []];
     for (let i = 0; i < 4; i++) {
-      let row = [board[0][i], board[1][i], board[2][i], board[3][i]];
+      let row = [];
+      for (let k = 0; k < 4; k++) {
+        row.push(board[k][i]);
+      }
       row = slide(row);
-      newBoard[0][i] = row[0]
-      newBoard[1][i] = row[1]
-      newBoard[2][i] = row[2]
-      newBoard[3][i] = row[3]
+      for (let r = 0; r < 4; r++) {
+        newBoard[r][i] = row[r];
+      }
     }
-    setBoard(newBoard)
-  }
+
+    setNumber(newBoard, board)
+    setBoard(newBoard);
+  };
 
   const slideDown = () => {
     const newBoard = [[], [], [], []];
     for (let i = 0; i < 4; i++) {
-      let row = [board[0][i], board[1][i], board[2][i], board[3][i]];
-      console.log('slideUp', row)
-      row.reverse()
+      let row = [];
+      for (let k = 0; k < 4; k++) {
+        row.push(board[k][i]);
+      }
+      row.reverse();
       row = slide(row);
-      row.reverse()
-      console.log('slideUp after slide', row)
-      console.log('newBoard after slide', newBoard)
-      newBoard[0][i] = row[0]
-      newBoard[1][i] = row[1]
-      newBoard[2][i] = row[2]
-      newBoard[3][i] = row[3]
+      row.reverse();
+      for (let r = 0; r < 4; r++) {
+        newBoard[r][i] = row[r];
+      }
     }
-    setBoard(newBoard)
-  }
+
+    setNumber(newBoard, board)
+    setBoard(newBoard);
+  };
 
   const swipeDirection = (code) => {
     switch (code) {
@@ -128,18 +207,38 @@ function App() {
 
   return (
     <div tabIndex={0} onKeyDown={(e) => swipeDirection(e.code)} className="App">
-      <h1>2048 Game</h1>
-      <button>new game</button>
-      <div className="score">{score}</div>
+
+      <div className='header'>
+        <div className='title'>2048</div>
+        <div className='activ'>
+          <div className='score-card'>
+            <div className="score">
+              score
+              <br />
+              {score}</div>
+            <div className='max-score'>
+              max score
+              <br />
+              {maxScore}
+            </div>
+          </div>
+          <button className='button' onClick={() => {newGame()}}>
+            {isGameOver ? 'new game' : 'restart game'}
+            </button>
+        </div>
+
+      </div>
+      
       <div className="board">
         {board.map((row, index) => {
           return <div className='board__row' key={index}>
             {row.map((num, i) =>
-              <div key={i} className={`title color-${num}`}>{num !== 0 ? num : null}</div>
+              <div key={i} className={`tile color-${num}`}>{num !== 0 ? num : null}</div>
             )}
           </div>
         })}
       </div>
+      {isGameOver && <div className="board game-over">Game over</div>}
     </div>
   );
 };
