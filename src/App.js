@@ -34,7 +34,7 @@ addNumber(initialBoard)
 function App() {
   const [board, setBoard] = useState(initialBoard)
   const [score, setScore] = useState(0)
-  const [maxScore, setMaxScore] = useState(0)
+  const [maxScore, setMaxScore] = useState(JSON.parse(localStorage.getItem('maxScore')) || {score: 0})
   const [isHaveZero, SetIsHaveZero] = useState(true)
   const [isGameOver, SetIsGameOver] = useState(false)
   let point = score;
@@ -45,10 +45,15 @@ function App() {
   }
 
   useEffect(() => {
-    if (score >= maxScore) {
-      setMaxScore(score)
+    if (score >= maxScore.score) {
+      setMaxScore({score: score})
     }
   },[score])
+
+  useEffect(() => {
+      localStorage.setItem('maxScore', JSON.stringify(maxScore));
+  },[maxScore.score])
+
 
   useEffect(() => {
     if (board.flat().includes(0)) {
@@ -111,7 +116,7 @@ function App() {
     if (board.flat().join() !== newBoard.flat().join()) {
       addNumber(newBoard)
     }
-  }
+  };
 
   const slideLeft = () => {
     const newBoard = []
@@ -181,22 +186,18 @@ function App() {
   const swipeDirection = (code) => {
     switch (code) {
       case 'ArrowUp': 
-      console.log('Up')
       slideUp()
         break;
 
       case 'ArrowDown': 
-      console.log('Down')
       slideDown()
         break;
 
       case 'ArrowLeft': 
-      console.log('Left')
       slideLeft()
         break;
 
       case 'ArrowRight': 
-      console.log('Right')
       slideRight()
         break;
     
@@ -219,14 +220,13 @@ function App() {
             <div className='max-score'>
               max score
               <br />
-              {maxScore}
+              {maxScore.score}
             </div>
           </div>
           <button className='button' onClick={() => {newGame()}}>
             {isGameOver ? 'new game' : 'restart game'}
             </button>
         </div>
-
       </div>
       
       <div className="board">
