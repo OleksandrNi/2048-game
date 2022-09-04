@@ -35,31 +35,38 @@ function App() {
   const [board, setBoard] = useState(initialBoard)
   const [score, setScore] = useState(0)
   const [maxScore, setMaxScore] = useState(JSON.parse(localStorage.getItem('maxScore')) || {score: 0})
-  const [isHaveZero, SetIsHaveZero] = useState(true)
-  const [isGameOver, SetIsGameOver] = useState(false)
+  const [isHaveZero, setIsHaveZero] = useState(true)
+  const [isGameOver, setIsGameOver] = useState(false)
+  const [isGameWin, setIsGameWin] = useState(false)
+  const [isGameWinShow, setIsGameWinShow] = useState(true)
+
   let point = score;
 
   const newGame = () => {
     setBoard(initialBoard)
-    SetIsGameOver(false)
+    setScore(0)
+    setIsGameOver(false)
   }
 
   useEffect(() => {
     if (score >= maxScore.score) {
       setMaxScore({score: score})
     }
-  },[score])
+    if (score >= 2048) {
+      setIsGameWin(true)
+    }
+  },[maxScore.score, score])
 
   useEffect(() => {
       localStorage.setItem('maxScore', JSON.stringify(maxScore));
-  },[maxScore.score])
+  },[maxScore, maxScore.score])
 
 
   useEffect(() => {
     if (board.flat().includes(0)) {
-      SetIsHaveZero(true)
+      setIsHaveZero(true)
     } else {
-      SetIsHaveZero(false)
+      setIsHaveZero(false)
     }
   },[board]);
   
@@ -85,11 +92,14 @@ function App() {
       }
 
       if (!isColumnMoveAvailable && !isRowMoveAvailable) {
-        console.log('inn set game over')
-        SetIsGameOver(true)
+        setIsGameOver(true)
       }
     }
   }, [board, isHaveZero])
+
+  const toggleWin = () => {
+    setIsGameWinShow(false)
+  }
   
   const filteredZero = (row) => {
     return row.filter(num => num !== 0)
@@ -239,6 +249,7 @@ function App() {
         })}
       </div>
       {isGameOver && <div className="board game-over">Game over</div>}
+      {isGameWin && isGameWinShow && <div onClick={() => toggleWin()} className="board game-over">You Win! Click for continue</div>}
     </div>
   );
 };
