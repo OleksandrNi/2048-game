@@ -289,7 +289,7 @@ function App() {
           </div>
         })}
         </div>
-        {isGameOver && <div className="board game-action">Game over</div>}
+        {isGameOver && <div style={{width: `${selectedSize.value * 80}px`, height: `${selectedSize.value * 80}px`}} className="board  game-action">Game over</div>}
         {isGameWin && isGameWinShow && <div onClick={() => toggleWin()} className="board game-action">You Win! Click for continue</div>}
       </div>}
     </div>
