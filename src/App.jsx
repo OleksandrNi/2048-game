@@ -2,67 +2,38 @@ import { useEffect, useState, useMemo } from 'react';
 import Select from "react-select";
 import './App.css';
 
-// const initialBoard = [
-//   [0, 0, 0, 0],
-//   [0, 0, 0, 0],
-//   [0, 0, 0, 0],
-//   [0, 0, 0, 0],
-// ]
-
-
-// const addNumber = (newBoard) => {
-//   let found = false
-//   while (!found) {
-//     let row = Math.floor(Math.random() * 4)
-//     let col = Math.floor(Math.random() * 4)
-//     let addDigit = 0;
-
-//     if (Math.random() < 0.9) {
-//       addDigit = 2;
-//     } else {
-//       addDigit = 4;
-//     }
-    
-//     if (newBoard[row][col] === 0) {
-//       newBoard[row][col] = addDigit;
-//       found = true;
-//     }
-//   }
-// }
-
-// addNumber(initialBoard)
-// addNumber(initialBoard)
-
 function App() {
-  const [board, setBoard] = useState()
-  const [score, setScore] = useState(0)
-  const [maxScore, setMaxScore] = useState(JSON.parse(localStorage.getItem('maxScore')) || {score: 0})
-  const [isHaveZero, setIsHaveZero] = useState(true)
-  const [isGameOver, setIsGameOver] = useState(false)
-  const [isGameWin, setIsGameWin] = useState(false)
-  const [isGameWinShow, setIsGameWinShow] = useState(true)
+  const [board, setBoard] = useState();
+  const [score, setScore] = useState(0);
+  const [maxScore, setMaxScore] = useState(JSON.parse(localStorage.getItem('maxScore')) || {score: 0});
+  const [isHaveZero, setIsHaveZero] = useState(true);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [isGameWin, setIsGameWin] = useState(false);
+  const [isGameWinShow, setIsGameWinShow] = useState(true);
   const [selectedSize, setSelectedSize] = useState();
 
-  // const initialBoard = [
-  //   [0, 0, 0, 0],
-  //   [0, 0, 0, 0],
-  //   [0, 0, 0, 0],
-  //   [0, 0, 0, 0],
-  // ]
+  let initialBoard = [];
+  const templateBoard = [];
+  let point = score;
 
-  let initialBoard = []
-
-  console.log('selectedSize', selectedSize);
+  if (selectedSize) {
+    for (let i = 0; i < selectedSize.value; i++) {
+      let row = [];
+      for (let k = 0; k < selectedSize.value; k++) {
+        row.push(0);
+      }
+      templateBoard.push(row);
+    }
+  }
 
   useEffect(() => {
     if (selectedSize) {
-      initialBoard = Array(selectedSize.value).fill(Array(selectedSize.value).fill(0))
-      console.log('initialBoardInEffect', initialBoard)
+      initialBoard = [...templateBoard];
     }
-  }, [selectedSize])
-
-
-  console.log('initialBoard', initialBoard)
+    addNumber(initialBoard);
+    addNumber(initialBoard);
+    setBoard(initialBoard);
+  }, [selectedSize]);
 
   const dropSizeData = [
     { value: 4, label: "classic" },
@@ -70,27 +41,18 @@ function App() {
     { value: 6, label: "6 X 6" }
   ];
   
- 
   const defaultSelectedValue = useMemo(() => {
     setSelectedSize(dropSizeData[0]);
     
     return dropSizeData[0];
   }, []);
   
-
-  useEffect(() => {
-    console.log('useEffect')
-      addNumber(initialBoard)
-      addNumber(initialBoard)
-      setBoard(initialBoard)
-  }, [selectedSize])
-
   
   const addNumber = (newBoard) => {
-    let found = false
+    let found = false;
     while (!found) {
-      let row = Math.floor(Math.random() * 4)
-      let col = Math.floor(Math.random() * 4)
+      let row = Math.floor(Math.random() * selectedSize.value);
+      let col = Math.floor(Math.random() * selectedSize.value);
       let addDigit = 0;
   
       if (Math.random() < 0.9) {
@@ -106,37 +68,36 @@ function App() {
     }
   }
 
-  console.log(board)
-  
-
-  let point = score;
 
   const newGame = () => {
-    setBoard(initialBoard)
-    setScore(0)
-    setIsGameOver(false)
+    console.log('initialBoardNewGame', initialBoard, templateBoard);
+    setBoard(templateBoard);
+    addNumber(templateBoard);
+    addNumber(templateBoard);
+    setScore(0);
+    setIsGameOver(false);
   }
 
   useEffect(() => {
     if (score >= maxScore.score) {
-      setMaxScore({score: score})
+      setMaxScore({score: score});
     }
     if (score >= 2048) {
-      setIsGameWin(true)
+      setIsGameWin(true);
     }
-  },[maxScore.score, score])
+  },[maxScore.score, score]);
 
   useEffect(() => {
       localStorage.setItem('maxScore', JSON.stringify(maxScore));
-  },[maxScore, maxScore.score])
+  },[maxScore, maxScore.score]);
 
 
   useEffect(() => {
     if (board) {
       if (board.flat().includes(0)) {
-        setIsHaveZero(true)
+        setIsHaveZero(true);
       } else {
-        setIsHaveZero(false)
+        setIsHaveZero(false);
       }
     }
   },[board]);
@@ -146,16 +107,16 @@ function App() {
       let isRowMoveAvailable = false;
       let isColumnMoveAvailable = false;
 
-      for (let i = 0; i < 4; i++) {
-        for(let k = 0; k < 3; k++) {
+      for (let i = 0; i < selectedSize.value; i++) {
+        for(let k = 0; k < selectedSize.value - 1; k++) {
           if (board[i][k] === board[i][k + 1]) {
-            isRowMoveAvailable = true
+            isRowMoveAvailable = true;
           }
         }
       }
   
-      for (let i = 0; i < 4; i++) {
-        for(let k = 0; k < 3; k++) {
+      for (let i = 0; i < selectedSize.value; i++) {
+        for(let k = 0; k < selectedSize.value - 1; k++) {
           if (board[k][i] === board[k + 1][i]) {
             isColumnMoveAvailable = true;
           }
@@ -163,17 +124,17 @@ function App() {
       }
 
       if (!isColumnMoveAvailable && !isRowMoveAvailable) {
-        setIsGameOver(true)
+        setIsGameOver(true);
       }
     }
-  }, [board, isHaveZero])
+  }, [board, isHaveZero]);
 
   const toggleWin = () => {
-    setIsGameWinShow(false)
+    setIsGameWinShow(false);
   }
   
   const filteredZero = (row) => {
-    return row.filter(num => num !== 0)
+    return row.filter(num => num !== 0);
   };
   
   const slide = (row) => {
@@ -182,104 +143,104 @@ function App() {
       if (row[i] === row[i + 1]) {
         row[i] *= 2;
         row[i + 1] = 0;
-        point = point + row[i] / 2
+        point = point + row[i] / 2;
       }
-      setScore(point)
+      setScore(point);
     }
-    row = filteredZero(row)
-    while (row.length < 4) {
-      row.push(0)
+    row = filteredZero(row);
+    while (row.length < selectedSize.value) {
+      row.push(0);
     }
     return row;
   };
 
   const setNumber = (newBoard, board) => {
     if (board.flat().join() !== newBoard.flat().join()) {
-      addNumber(newBoard)
+      addNumber(newBoard);
     }
   };
 
   const slideLeft = () => {
-    const newBoard = []
-    for (let i = 0; i < 4; i++) {
+    const newBoard = [];
+    for (let i = 0; i < selectedSize.value; i++) {
       newBoard[i] = slide(board[i]);
     }
 
-    setNumber(newBoard, board)
+    setNumber(newBoard, board);
     setBoard(newBoard);
   };
 
   const slideRight = () => {
-    const newBoard = [[], [], [], []];
-    for (let i = 0; i < 4; i++) {
+    const newBoard = [...templateBoard];
+    for (let i = 0; i < selectedSize.value; i++) {
       let row = [];
-      for (let k = 0; k < 4; k++) {
+      for (let k = 0; k < selectedSize.value; k++) {
         row.push(board[i][k]);
       }
       row.reverse();
       row = slide(row);
       row.reverse();
-      for (let r = 0; r < 4; r++) {
+      for (let r = 0; r < selectedSize.value; r++) {
         newBoard[i][r] = row[r];
       }
     }
   
-    setNumber(newBoard, board)
+    setNumber(newBoard, board);
     setBoard(newBoard);
   };
 
   const slideUp = () => {
-    const newBoard = [[], [], [], []];
-    for (let i = 0; i < 4; i++) {
+    const newBoard = [...templateBoard];
+    for (let i = 0; i < selectedSize.value; i++) {
       let row = [];
-      for (let k = 0; k < 4; k++) {
+      for (let k = 0; k < selectedSize.value; k++) {
         row.push(board[k][i]);
       }
       row = slide(row);
-      for (let r = 0; r < 4; r++) {
+      for (let r = 0; r < selectedSize.value; r++) {
         newBoard[r][i] = row[r];
       }
     }
 
-    setNumber(newBoard, board)
+    setNumber(newBoard, board);
     setBoard(newBoard);
   };
 
   const slideDown = () => {
-    const newBoard = [[], [], [], []];
-    for (let i = 0; i < 4; i++) {
+    const newBoard = [...templateBoard];
+    for (let i = 0; i < selectedSize.value; i++) {
       let row = [];
-      for (let k = 0; k < 4; k++) {
+      for (let k = 0; k < selectedSize.value; k++) {
         row.push(board[k][i]);
       }
       row.reverse();
       row = slide(row);
       row.reverse();
-      for (let r = 0; r < 4; r++) {
+      for (let r = 0; r < selectedSize.value; r++) {
         newBoard[r][i] = row[r];
       }
     }
 
-    setNumber(newBoard, board)
+    setNumber(newBoard, board);
     setBoard(newBoard);
   };
 
   const swipeDirection = (code) => {
     switch (code) {
       case 'ArrowUp': 
-      slideUp()
+      slideUp();
         break;
 
       case 'ArrowDown': 
-      slideDown()
+      slideDown();
         break;
 
       case 'ArrowLeft': 
-      slideLeft()
+      slideLeft();
         break;
 
       case 'ArrowRight': 
-      slideRight()
+      slideRight();
         break;
     
       default:
@@ -287,13 +248,20 @@ function App() {
     }
   };
 
-
-
   return (
     <div tabIndex={0} onKeyDown={(e) => swipeDirection(e.code)} className="App">
       {board && <div>
       <div className='header'>
-        <div className='title'>2048</div>
+        <div className='header__title'>
+          <div className='title'>2048</div>
+          <Select
+            defaultValue={defaultSelectedValue}
+            value={selectedSize}
+            onChange={(value) => setSelectedSize(value)}
+            name="Select"
+            options={dropSizeData}
+          />
+        </div>
         <div className='activ'>
           <div className='score-card'>
             <div className="score">
@@ -308,11 +276,11 @@ function App() {
           </div>
           <button className='button' onClick={() => {newGame()}}>
             {isGameOver ? 'new game' : 'restart game'}
-            </button>
+          </button>
         </div>
       </div>
       
-      <div className="board" style={{width: '400px', height: '400px'}}>
+      <div className="board" style={{width: `${selectedSize.value * 80}px`, height: `${selectedSize.value * 80}px`}}>
         {board.map((row, index) => {
           return <div className='board__row' key={index}>
             {row.map((num, i) =>
@@ -320,16 +288,9 @@ function App() {
             )}
           </div>
         })}
-      </div>
-      {isGameOver && <div className="board game-over">Game over</div>}
-      {isGameWin && isGameWinShow && <div onClick={() => toggleWin()} className="board game-over">You Win! Click for continue</div>}
-      <Select
-        defaultValue={defaultSelectedValue}
-        value={selectedSize}
-        onChange={(value) => setSelectedSize(value)}
-        name="Select"
-        options={dropSizeData}
-      />
+        </div>
+        {isGameOver && <div className="board game-action">Game over</div>}
+        {isGameWin && isGameWinShow && <div onClick={() => toggleWin()} className="board game-action">You Win! Click for continue</div>}
       </div>}
     </div>
   );
