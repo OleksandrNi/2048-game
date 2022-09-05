@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import Select from "react-select";
 import './App.css';
 
 const initialBoard = [
@@ -8,31 +9,32 @@ const initialBoard = [
   [0, 0, 0, 0],
 ]
 
-const addNumber = (newBoard) => {
-  let found = false
-  while (!found) {
-    let row = Math.floor(Math.random() * 4)
-    let col = Math.floor(Math.random() * 4)
-    let addDigit = 0;
 
-    if (Math.random() < 0.9) {
-      addDigit = 2;
-    } else {
-      addDigit = 4;
-    }
+// const addNumber = (newBoard) => {
+//   let found = false
+//   while (!found) {
+//     let row = Math.floor(Math.random() * 4)
+//     let col = Math.floor(Math.random() * 4)
+//     let addDigit = 0;
+
+//     if (Math.random() < 0.9) {
+//       addDigit = 2;
+//     } else {
+//       addDigit = 4;
+//     }
     
-    if (newBoard[row][col] === 0) {
-      newBoard[row][col] = addDigit;
-      found = true;
-    }
-  }
-}
+//     if (newBoard[row][col] === 0) {
+//       newBoard[row][col] = addDigit;
+//       found = true;
+//     }
+//   }
+// }
 
-addNumber(initialBoard)
-addNumber(initialBoard)
+// addNumber(initialBoard)
+// addNumber(initialBoard)
 
 function App() {
-  const [board, setBoard] = useState(initialBoard)
+  const [board, setBoard] = useState()
   const [score, setScore] = useState(0)
   const [maxScore, setMaxScore] = useState(JSON.parse(localStorage.getItem('maxScore')) || {score: 0})
   const [isHaveZero, setIsHaveZero] = useState(true)
@@ -40,6 +42,55 @@ function App() {
   const [isGameWin, setIsGameWin] = useState(false)
   const [isGameWinShow, setIsGameWinShow] = useState(true)
 
+
+  
+  useEffect(() => {
+    console.log('useEffect')
+    addNumber(initialBoard)
+    setBoard(initialBoard)
+  }, [])
+
+  
+  const addNumber = (newBoard) => {
+    let found = false
+    while (!found) {
+      let row = Math.floor(Math.random() * 4)
+      let col = Math.floor(Math.random() * 4)
+      let addDigit = 0;
+  
+      if (Math.random() < 0.9) {
+        addDigit = 2;
+      } else {
+        addDigit = 4;
+      }
+      
+      if (newBoard[row][col] === 0) {
+        newBoard[row][col] = addDigit;
+        found = true;
+      }
+    }
+  }
+  
+  console.log(board)
+  
+    const dropSizeData = [
+    { value: 4, label: "classic" },
+    { value: 5, label: "5 X 5" },
+    { value: 6, label: "6 X 6" }
+  ];
+
+  const [selectedSize, setSelectedSize] = useState();
+
+  
+  const defaultSelectedValue = useMemo(() => {
+    setSelectedSize(dropSizeData[0]);
+    
+    return dropSizeData[0];
+  }, []);
+  console.log(selectedSize);
+  
+  // const initialBoard = Array(selectedSize.value).fill(Array(selectedSize.value).fill([]))
+  
   let point = score;
 
   const newGame = () => {
@@ -63,10 +114,12 @@ function App() {
 
 
   useEffect(() => {
-    if (board.flat().includes(0)) {
-      setIsHaveZero(true)
-    } else {
-      setIsHaveZero(false)
+    if (board) {
+      if (board.flat().includes(0)) {
+        setIsHaveZero(true)
+      } else {
+        setIsHaveZero(false)
+      }
     }
   },[board]);
   
@@ -216,9 +269,11 @@ function App() {
     }
   };
 
+
+
   return (
     <div tabIndex={0} onKeyDown={(e) => swipeDirection(e.code)} className="App">
-
+      {board && <div>
       <div className='header'>
         <div className='title'>2048</div>
         <div className='activ'>
@@ -239,7 +294,7 @@ function App() {
         </div>
       </div>
       
-      <div className="board">
+      <div className="board" style={{width: '400px', height: '400px'}}>
         {board.map((row, index) => {
           return <div className='board__row' key={index}>
             {row.map((num, i) =>
@@ -250,6 +305,14 @@ function App() {
       </div>
       {isGameOver && <div className="board game-over">Game over</div>}
       {isGameWin && isGameWinShow && <div onClick={() => toggleWin()} className="board game-over">You Win! Click for continue</div>}
+      <Select
+        defaultValue={defaultSelectedValue}
+        value={selectedSize}
+        onChange={(value) => setSelectedSize(value)}
+        name="Select"
+        options={dropSizeData}
+      />
+      </div>}
     </div>
   );
 };
