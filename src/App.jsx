@@ -2,12 +2,12 @@ import { useEffect, useState, useMemo } from 'react';
 import Select from "react-select";
 import './App.css';
 
-const initialBoard = [
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-]
+// const initialBoard = [
+//   [0, 0, 0, 0],
+//   [0, 0, 0, 0],
+//   [0, 0, 0, 0],
+//   [0, 0, 0, 0],
+// ]
 
 
 // const addNumber = (newBoard) => {
@@ -41,14 +41,49 @@ function App() {
   const [isGameOver, setIsGameOver] = useState(false)
   const [isGameWin, setIsGameWin] = useState(false)
   const [isGameWinShow, setIsGameWinShow] = useState(true)
+  const [selectedSize, setSelectedSize] = useState();
+
+  // const initialBoard = [
+  //   [0, 0, 0, 0],
+  //   [0, 0, 0, 0],
+  //   [0, 0, 0, 0],
+  //   [0, 0, 0, 0],
+  // ]
+
+  let initialBoard = []
+
+  console.log('selectedSize', selectedSize);
+
+  useEffect(() => {
+    if (selectedSize) {
+      initialBoard = Array(selectedSize.value).fill(Array(selectedSize.value).fill(0))
+      console.log('initialBoardInEffect', initialBoard)
+    }
+  }, [selectedSize])
 
 
+  console.log('initialBoard', initialBoard)
+
+  const dropSizeData = [
+    { value: 4, label: "classic" },
+    { value: 5, label: "5 X 5" },
+    { value: 6, label: "6 X 6" }
+  ];
   
+ 
+  const defaultSelectedValue = useMemo(() => {
+    setSelectedSize(dropSizeData[0]);
+    
+    return dropSizeData[0];
+  }, []);
+  
+
   useEffect(() => {
     console.log('useEffect')
-    addNumber(initialBoard)
-    setBoard(initialBoard)
-  }, [])
+      addNumber(initialBoard)
+      addNumber(initialBoard)
+      setBoard(initialBoard)
+  }, [selectedSize])
 
   
   const addNumber = (newBoard) => {
@@ -70,27 +105,10 @@ function App() {
       }
     }
   }
-  
+
   console.log(board)
   
-    const dropSizeData = [
-    { value: 4, label: "classic" },
-    { value: 5, label: "5 X 5" },
-    { value: 6, label: "6 X 6" }
-  ];
 
-  const [selectedSize, setSelectedSize] = useState();
-
-  
-  const defaultSelectedValue = useMemo(() => {
-    setSelectedSize(dropSizeData[0]);
-    
-    return dropSizeData[0];
-  }, []);
-  console.log(selectedSize);
-  
-  // const initialBoard = Array(selectedSize.value).fill(Array(selectedSize.value).fill([]))
-  
   let point = score;
 
   const newGame = () => {
