@@ -14,7 +14,7 @@ function App() {
 
   let initialBoard = [];
   const templateBoard = [];
-  let point = score;
+  let point = score; 
 
   if (selectedSize) {
     for (let i = 0; i < selectedSize.value; i++) {
