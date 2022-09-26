@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/2048-game/static/css/main.beddf499.css",
+    "main.js": "/2048-game/static/js/main.25f448fe.js",
+    "index.html": "/2048-game/index.html",
+    "main.beddf499.css.map": "/2048-game/static/css/main.beddf499.css.map",
+    "main.25f448fe.js.map": "/2048-game/static/js/main.25f448fe.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.beddf499.css",
+    "static/js/main.25f448fe.js"
+  ]
+}
